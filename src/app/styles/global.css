@@ -1,0 +1,52 @@
+:root {
+  --color-bg: #090d1a;
+  --color-surface: #11182d;
+  --color-surface-soft: #1a2340;
+  --color-border: #2e3b64;
+  --color-text: #eef2ff;
+  --color-text-muted: #94a0c6;
+  --color-accent: #7daeff;
+  --color-accent-strong: #548eff;
+  --color-success: #59d49a;
+  --color-danger: #ff7395;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --blur-md: 10px;
+  --space-2xs: 6px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --control-height-sm: 34px;
+  --control-height-md: 44px;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 38px;
+  --motion-fast: 150ms;
+  --motion-base: 260ms;
+  --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.28);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, 'Segoe UI', sans-serif;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(84, 142, 255, 0.2) 0%, transparent 35%),
+    radial-gradient(circle at 100% 0%, rgba(125, 174, 255, 0.16) 0%, transparent 40%),
+    var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--font-size-md);
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  min-height: 100vh;
+}
