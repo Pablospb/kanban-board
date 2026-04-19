@@ -1,10 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" sizes="any" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>temp-app</title>
+    <!-- PWA: Web App Manifest (public/manifest.json; иконки — SVG, без растровой генерации) -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#3b82f6" />
+    <meta name="application-name" content="Мой Канбан" />
+    <!-- iOS: установка на домашний экран + строка состояния в тон темы -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Канбан" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-icon" href="/icon-maskable.svg" />
+    <title>Мой Канбан</title>
   </head>
   <body>
     <div id="app"></div>
