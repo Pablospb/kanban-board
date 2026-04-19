@@ -4,7 +4,7 @@ import App from './App.vue'
 
 import { router } from './router'
 
-import { initPwaInstallPrompt } from './shared/lib/pwaInstallPrompt'
+import { initPwaInstallPrompt } from '@/shared/lib/pwaInstallPrompt'
 
 
 
