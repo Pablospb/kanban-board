@@ -1,60 +1,75 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
+import {
+  deferredInstallPrompt,
+  clearDeferredInstallPrompt,
+} from '@/shared/lib/pwaInstallPrompt'
 
 const router = useRouter()
-const deferredPrompt = ref<any>(null)
+const installButtonRef = ref<HTMLButtonElement | null>(null)
+const installAvailable = ref(false)
 const isInstalled = ref(false)
-const showInstallButton = ref(true)
 
 const updateInstallStatus = () => {
   isInstalled.value = window.matchMedia('(display-mode: standalone)').matches
-  showInstallButton.value = !isInstalled.value
+  if (isInstalled.value) {
+    installAvailable.value = false
+  }
 }
 
-const onBeforeInstallPrompt = (e: Event) => {
-  e.preventDefault()
-  deferredPrompt.value = e
+const onPwaInstallReady = () => {
+  updateInstallStatus()
+  if (!isInstalled.value) {
+    installAvailable.value = true
+  }
 }
 
-const onAppInstalled = () => {
-  isInstalled.value = true
-  showInstallButton.value = false
-  deferredPrompt.value = null
-  alert('✅ Приложение успешно установлено!')
+const onPwaInstalled = () => {
+  updateInstallStatus()
+  installAvailable.value = false
 }
 
 onMounted(() => {
-  console.log('PWA script loaded, waiting for beforeinstallprompt...')
   updateInstallStatus()
+  if (deferredInstallPrompt && !isInstalled.value) {
+    installAvailable.value = true
+  }
 
-  window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
-  window.addEventListener('appinstalled', onAppInstalled)
+  window.addEventListener('pwa-install-ready', onPwaInstallReady)
+  window.addEventListener('pwa-installed', onPwaInstalled)
   window.addEventListener('resize', updateInstallStatus)
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt)
-  window.removeEventListener('appinstalled', onAppInstalled)
+  window.removeEventListener('pwa-install-ready', onPwaInstallReady)
+  window.removeEventListener('pwa-installed', onPwaInstalled)
   window.removeEventListener('resize', updateInstallStatus)
 })
 
+watchEffect((onCleanup) => {
+  const el = installButtonRef.value
+  if (!el || !installAvailable.value) return
+
+  const handler = () => {
+    void handleInstallClick()
+  }
+  el.addEventListener('click', handler)
+  onCleanup(() => el.removeEventListener('click', handler))
+})
+
 const handleInstallClick = async () => {
-  if (!deferredPrompt.value) {
-    console.log('No deferredPrompt')
-    alert('Браузер пока не готов к установке. Попробуйте обновить страницу.')
+  const promptEvent = deferredInstallPrompt
+  if (!promptEvent) {
+    console.warn('PWA: нет сохранённого beforeinstallprompt')
     return
   }
 
-  const promptEvent = deferredPrompt.value
-  promptEvent.prompt()
-
+  await promptEvent.prompt()
   const { outcome } = await promptEvent.userChoice
-  console.log('Install outcome:', outcome)
-  if (outcome === 'accepted') {
-    deferredPrompt.value = null
-    showInstallButton.value = false
-  }
+  console.log('PWA: результат установки:', outcome)
+  clearDeferredInstallPrompt()
+  installAvailable.value = false
 }
 
 const goToKanban = () => router.push('/kanban')
@@ -82,30 +97,34 @@ const goToKanban = () => router.push('/kanban')
         </p>
 
         <div class="flex flex-col items-center gap-4">
-          <button
-            v-if="showInstallButton"
-            type="button"
-            class="landing-cta group relative mx-auto inline-flex min-h-[68px] w-full max-w-xl items-center justify-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-r from-blue-500 to-violet-600 px-10 py-5 text-lg font-semibold text-white shadow-xl transition-all hover:scale-105 active:scale-95"
-            @click="handleInstallClick"
-          >
-            <span class="text-3xl">📌</span>
-            <span>Добавить мою доску на рабочий стол</span>
-          </button>
-
-          <div v-else class="text-center">
-            <p class="text-green-400 text-xl mb-3">✅ Доска уже добавлена на рабочий стол</p>
+          <template v-if="!isInstalled">
             <button
+              ref="installButtonRef"
               type="button"
-              class="rounded-xl bg-white/10 px-8 py-4 text-white hover:bg-white/20 transition-colors"
-              @click="goToKanban"
+              :hidden="!installAvailable"
+              class="landing-cta group relative mx-auto inline-flex min-h-[68px] w-full max-w-xl items-center justify-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-r from-blue-500 to-violet-600 px-10 py-5 text-lg font-semibold text-white shadow-xl transition-all hover:scale-105 active:scale-95"
             >
-              Открыть Канбан →
+              <span class="text-3xl">📌</span>
+              <span>Добавить мою доску на рабочий стол</span>
             </button>
-          </div>
 
-          <p class="text-sm text-gray-400 max-w-md text-center">
-            Нажмите, чтобы браузер предложил установить приложение как отдельную программу
-          </p>
+            <p v-if="installAvailable" class="text-sm text-gray-400 max-w-md text-center">
+              Нажмите, чтобы браузер предложил установить приложение как отдельную программу
+            </p>
+          </template>
+
+          <template v-else>
+            <div class="text-center">
+              <p class="text-green-400 text-xl mb-3">✅ Доска уже добавлена на рабочий стол</p>
+              <button
+                type="button"
+                class="rounded-xl bg-white/10 px-8 py-4 text-white hover:bg-white/20 transition-colors"
+                @click="goToKanban"
+              >
+                Открыть Канбан →
+              </button>
+            </div>
+          </template>
         </div>
       </div>
 
