@@ -5,6 +5,16 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [tailwindcss(), vue()],
+  server: {
+    host: true,
+    port: 5173,
+    open: true,
+  },
+  preview: {
+    host: true,
+    port: 4173,
+    open: true,
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src')
