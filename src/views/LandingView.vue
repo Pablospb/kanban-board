@@ -25,6 +25,7 @@ const onAppInstalled = () => {
 }
 
 onMounted(() => {
+  console.log('PWA script loaded, waiting for beforeinstallprompt...')
   updateInstallStatus()
 
   window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
@@ -40,8 +41,8 @@ onBeforeUnmount(() => {
 
 const handleInstallClick = async () => {
   if (!deferredPrompt.value) {
-    alert('Установка пока недоступна в этом браузере')
-    router.push('/kanban')
+    console.log('No deferredPrompt')
+    alert('Браузер пока не готов к установке. Попробуйте обновить страницу.')
     return
   }
 
@@ -49,6 +50,7 @@ const handleInstallClick = async () => {
   promptEvent.prompt()
 
   const { outcome } = await promptEvent.userChoice
+  console.log('Install outcome:', outcome)
   if (outcome === 'accepted') {
     deferredPrompt.value = null
     showInstallButton.value = false
