@@ -10,12 +10,10 @@ export default defineConfig({
     }
   },
   /**
-   * PWA (установка из браузера):
-   * - Web App Manifest: `public/manifest.json` (иконки SVG: `/icon.svg`, maskable `/icon-maskable.svg`).
-   * - Подключение в `index.html`: link rel=manifest, meta theme-color, теги под Apple.
+   * PWA: `public/manifest.json` (иконки PNG: `/icons/icon-192.png`, `/icons/icon-512.png`), SW — `public/sw.js`.
+   * В `index.html`: link manifest, theme-color, Apple touch icon.
    *
-   * Ниже — manifest **сборки Vite** (карта имён чанков → файлы с хэшами в `dist/.vite/manifest.json`).
-   * Это не манифест PWA и не перезаписывает `/manifest.json` из public.
+   * `build.manifest` — это карта чанков Vite (`dist/.vite/manifest.json`), не Web App Manifest.
    */
   build: {
     manifest: true,

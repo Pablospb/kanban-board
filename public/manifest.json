@@ -3,12 +3,9 @@
   "short_name": "Канбан",
   "description": "Красивая канбан-доска нового поколения",
   "start_url": "/",
-  "id": "/?source=pwa",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#0f172a",
   "theme_color": "#4f46e5",
-  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icons/icon-192.png",
