@@ -99,6 +99,14 @@ const goToKanban = () => router.push('/kanban')
         <div class="flex flex-col items-center gap-4">
           <template v-if="!isInstalled">
             <button
+              type="button"
+              class="mx-auto inline-flex min-h-[56px] w-full max-w-xl items-center justify-center rounded-2xl border-2 border-white/80 bg-white/10 px-10 py-4 text-lg font-semibold text-white shadow-lg backdrop-blur-sm transition-all hover:bg-white/20 active:scale-[0.99]"
+              @click="goToKanban"
+            >
+              Открыть канбан в браузере
+            </button>
+
+            <button
               ref="installButtonRef"
               type="button"
               :hidden="!installAvailable"

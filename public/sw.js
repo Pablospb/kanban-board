@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kanban-cache-v2';
+const CACHE_NAME = 'kanban-cache-v3';
 
 const PRECACHE_URLS = [
   '/',
@@ -38,6 +38,22 @@ self.addEventListener('fetch', (event) => {
       fetch(request).catch(() =>
         caches.match('/index.html').then((r) => r || caches.match('/'))
       )
+    )
+    return
+  }
+
+  // Чанки Vite в /assets/ — network-first, иначе после деплоя можно отдать старый JS из кэша.
+  if (url.pathname.startsWith('/assets/')) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response && response.status === 200 && response.type === 'basic') {
+            const copy = response.clone()
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy))
+          }
+          return response
+        })
+        .catch(() => caches.match(request))
     )
     return
   }

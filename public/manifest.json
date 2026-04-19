@@ -2,7 +2,7 @@
   "name": "Мой Канбан",
   "short_name": "Канбан",
   "description": "Красивая канбан-доска нового поколения",
-  "start_url": "/",
+  "start_url": "/kanban",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#4f46e5",
