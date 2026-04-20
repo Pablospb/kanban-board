@@ -147,18 +147,24 @@ const emit = defineEmits(['close'])
 
 <template>
   <div class="min-h-screen bg-zinc-950 text-white">
-    <div class="border-b border-zinc-800 bg-zinc-900 py-5 sticky top-0 z-10">
-      <div class="max-w-7xl mx-auto px-8 flex items-center justify-between">
-        <div class="flex items-center gap-4">
-          <span class="text-4xl">📋</span>
-          <div>
-            <h1 class="text-3xl font-bold">Канбан Доска</h1>
-            <p class="text-zinc-400 text-sm">Modern Todo</p>
+    <div
+      class="border-b border-zinc-800 bg-zinc-900 pb-5 pt-[max(1.25rem,env(safe-area-inset-top,0px))] sticky top-0 z-10"
+    >
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-8 flex flex-wrap items-center justify-between gap-4"
+      >
+        <div class="flex min-w-0 items-center gap-4">
+          <span class="text-4xl shrink-0">📋</span>
+          <div class="min-w-0">
+            <h1 class="text-2xl sm:text-3xl font-bold truncate">Канбан Доска</h1>
+            <p class="text-zinc-400 text-sm truncate">Modern Todo</p>
           </div>
         </div>
-        <button 
+        <button
+          type="button"
           @click="emit('close')"
-          class="flex items-center gap-2 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl transition-colors text-sm font-medium">
+          class="shrink-0 flex items-center gap-2 px-4 sm:px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl transition-colors text-sm font-medium"
+        >
           ← Вернуться на главную
         </button>
       </div>
@@ -172,47 +178,49 @@ const emit = defineEmits(['close'])
              @dragover="allowDrop"
              @drop="drop($event, column.id)">
           
-          <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center gap-3">
-              <div :class="['w-4 h-4 rounded-full', column.color]"></div>
-              <h2 class="text-2xl font-semibold">{{ column.title }}</h2>
+          <div class="flex items-center justify-between gap-3 mb-6">
+            <div class="flex min-w-0 items-center gap-3">
+              <div :class="['w-4 h-4 shrink-0 rounded-full', column.color]"></div>
+              <h2 class="text-xl sm:text-2xl font-semibold truncate">{{ column.title }}</h2>
             </div>
-            <div class="bg-zinc-800 text-xs px-3 py-1 rounded-2xl font-mono">
+            <div class="shrink-0 bg-zinc-800 text-xs px-3 py-1 rounded-2xl font-mono tabular-nums">
               {{ column.tasks.length }}
             </div>
           </div>
 
           <!-- Поле добавления + кнопка -->
-          <div class="flex gap-2 mb-4">
+          <div class="flex gap-2 mb-4 min-w-0">
             <input
               v-model="newTaskTitle"
               @keyup.enter="addTask(column.id)"
               placeholder="Добавить задачу..."
-              class="flex-1 bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-2xl px-5 py-3 text-sm outline-none"
+              class="min-w-0 flex-1 bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-2xl px-5 py-3 text-sm outline-none"
             >
             <button
+              type="button"
               @click="addTask(column.id)"
-              class="w-12 h-12 bg-violet-600 hover:bg-violet-500 active:bg-violet-700 rounded-2xl text-3xl flex items-center justify-center transition-all active:scale-90"
+              class="shrink-0 w-12 h-12 bg-violet-600 hover:bg-violet-500 active:bg-violet-700 rounded-2xl text-3xl flex items-center justify-center transition-all active:scale-90"
             >
               +
             </button>
           </div>
 
           <!-- Выбор приоритета (один раз на колонку) -->
-          <div class="flex gap-1.5 mb-6 p-1 bg-zinc-950 rounded-2xl">
+          <div class="flex gap-1.5 mb-6 min-w-0 p-1 bg-zinc-950 rounded-2xl">
             <button
               v-for="p in ['high', 'medium', 'low']"
               :key="p"
+              type="button"
               @click="newTaskPriority = p as any"
               :class="[
-                'flex-1 flex items-center justify-center gap-2 py-2 text-xs font-medium rounded-xl transition-all',
-                newTaskPriority === p 
-                  ? 'bg-zinc-800 shadow-inner ring-1 ring-violet-400' 
-                  : 'hover:bg-zinc-900'
+                'min-w-0 flex-1 flex items-center justify-center gap-1 sm:gap-2 py-2 px-1 text-[10px] sm:text-xs font-medium rounded-xl transition-all',
+                newTaskPriority === p
+                  ? 'bg-zinc-800 shadow-inner ring-1 ring-violet-400'
+                  : 'hover:bg-zinc-900',
               ]"
             >
-              <span :class="['w-3 h-3 rounded-full', getPriorityColor(p)]"></span>
-              {{ getPriorityLabel(p) }}
+              <span :class="['w-3 h-3 shrink-0 rounded-full', getPriorityColor(p)]"></span>
+              <span class="truncate">{{ getPriorityLabel(p) }}</span>
             </button>
           </div>
 
@@ -226,26 +234,27 @@ const emit = defineEmits(['close'])
               class="group bg-zinc-800 border border-zinc-700 hover:border-zinc-500 rounded-2xl p-5 cursor-grab active:cursor-grabbing transition-all relative"
             >
               <button
+                type="button"
                 @click.stop="deleteTask(column.id, task.id)"
-                class="absolute top-4 right-4 text-zinc-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all text-xl"
+                class="absolute top-3 right-3 z-[1] text-zinc-500 hover:text-red-500 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all text-xl leading-none p-1"
               >
                 ×
               </button>
 
-              <div v-if="editingTaskId === task.id">
+              <div v-if="editingTaskId === task.id" class="min-w-0 pr-10">
                 <input
                   v-model="editValue"
                   @keyup.enter="saveEdit(column.id, task.id)"
                   @blur="saveEdit(column.id, task.id)"
                   @keyup.escape="cancelEdit"
-                  class="w-full bg-zinc-700 border border-violet-500 rounded-xl px-4 py-2.5 outline-none"
+                  class="w-full min-w-0 bg-zinc-700 border border-violet-500 rounded-xl px-4 py-2.5 outline-none"
                   autofocus
                 >
               </div>
-              <div 
-                v-else 
+              <div
+                v-else
                 @click="startEditing(task)"
-                class="font-medium pr-8 cursor-text hover:text-white transition-colors"
+                class="min-w-0 font-medium pr-10 break-words cursor-text hover:text-white transition-colors"
               >
                 {{ task.title }}
               </div>
