@@ -2,11 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: dark;
+  --color-bg: #09090b;
+  --color-surface: #18181b;
+  --color-surface-soft: #27272a;
+  --color-surface-elevated: #18181b;
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-text: #fafafa;
+  --color-text-muted: #a1a1aa;
+  --color-accent: #a855f7;
+  --color-accent-hover: #9333ea;
+  --color-success: #34d399;
+  --color-danger: #f87171;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 24px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --font-size-xs: 0.85rem;
+  --font-size-sm: 0.9rem;
+  --font-size-xl: 1.35rem;
+  --motion-base: 0.2s;
+}
+
 body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  background: #09090b;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 #app {

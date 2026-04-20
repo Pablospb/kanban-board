@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue'
+import { RouterLink } from 'vue-router'
 
 interface Task {
   id: string
@@ -185,132 +186,111 @@ const getPriorityLabel = (p: Task['priority']) => {
   if (p === 'medium') return 'Средний'
   return 'Низкий'
 }
-
-const emit = defineEmits(['close'])
 </script>
 
 <template>
-  <div class="min-h-screen bg-zinc-950 text-white">
-    <div
-      class="border-b border-zinc-800 bg-zinc-900 pb-5 pt-[max(1.25rem,env(safe-area-inset-top,0px))] sticky top-0 z-10"
-    >
+  <div class="kanban-board">
+    <header class="kanban-board__toolbar">
+      <div class="kanban-board__toolbar-text">
+        <h1 class="kanban-board__title">Канбан-доска</h1>
+        <p class="kanban-board__subtitle">Задачи сохраняются локально в этом браузере</p>
+      </div>
+      <RouterLink class="kanban-board__link-landing" :to="{ name: 'landing' }">
+        Лендинг и установка PWA
+      </RouterLink>
+    </header>
+
+    <div class="kanban-board__grid">
       <div
-        class="max-w-7xl mx-auto px-4 sm:px-8 flex flex-wrap items-center justify-between gap-4"
+        v-for="column in columns"
+        :key="column.id"
+        class="kanban-board__column"
+        @dragover="allowDrop"
+        @drop="drop($event, column.id)"
       >
-        <div class="flex min-w-0 items-center gap-4">
-          <span class="text-4xl shrink-0">📋</span>
-          <div class="min-w-0">
-            <h1 class="text-2xl sm:text-3xl font-bold truncate">Канбан Доска</h1>
-            <p class="text-zinc-400 text-sm truncate">Modern Todo</p>
+        <div class="kanban-board__column-head">
+          <div class="kanban-board__column-title-wrap">
+            <div :class="['kanban-board__column-dot', column.color]"></div>
+            <h2 class="kanban-board__column-title">{{ column.title }}</h2>
+          </div>
+          <div class="kanban-board__column-count">
+            {{ column.tasks.length }}
           </div>
         </div>
-        <button
-          type="button"
-          @click="emit('close')"
-          class="shrink-0 flex items-center gap-2 px-4 sm:px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl transition-colors text-sm font-medium"
-        >
-          ← Вернуться на главную
-        </button>
-      </div>
-    </div>
 
-    <div class="max-w-7xl mx-auto p-8">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div v-for="column in columns" 
-             :key="column.id"
-             class="bg-zinc-900 rounded-3xl p-6 border border-zinc-800/80"
-             @dragover="allowDrop"
-             @drop="drop($event, column.id)">
-          
-          <div class="flex items-center justify-between gap-3 mb-6">
-            <div class="flex min-w-0 items-center gap-3">
-              <div :class="['w-4 h-4 shrink-0 rounded-full', column.color]"></div>
-              <h2 class="text-xl sm:text-2xl font-semibold truncate">{{ column.title }}</h2>
-            </div>
-            <div class="shrink-0 bg-zinc-800 text-xs px-3 py-1 rounded-2xl font-mono tabular-nums">
-              {{ column.tasks.length }}
-            </div>
-          </div>
+        <div class="kanban-board__add-row">
+          <input
+            v-model="newTaskTitle"
+            class="kanban-board__input"
+            placeholder="Добавить задачу..."
+            @keyup.enter="addTask(column.id)"
+          >
+          <button type="button" class="kanban-board__add-btn" @click="addTask(column.id)">
+            +
+          </button>
+        </div>
 
-          <!-- Поле добавления + кнопка -->
-          <div class="flex gap-2 mb-4 min-w-0">
-            <input
-              v-model="newTaskTitle"
-              @keyup.enter="addTask(column.id)"
-              placeholder="Добавить задачу..."
-              class="min-w-0 flex-1 bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-2xl px-5 py-3 text-sm outline-none"
-            >
+        <div class="kanban-board__priority-row">
+          <button
+            v-for="p in NEW_TASK_PRIORITY_OPTIONS"
+            :key="p"
+            type="button"
+            class="kanban-board__priority-btn"
+            :class="{ 'kanban-board__priority-btn--active': newTaskPriority === p }"
+            @click="newTaskPriority = p"
+          >
+            <span :class="['kanban-board__priority-dot', getPriorityColor(p)]"></span>
+            <span class="kanban-board__priority-label">{{ getPriorityLabel(p) }}</span>
+          </button>
+        </div>
+
+        <div class="kanban-board__tasks">
+          <div
+            v-for="task in column.tasks"
+            :key="task.id"
+            class="kanban-board__task"
+            draggable="true"
+            @dragstart="startDrag(task, column.id)"
+          >
             <button
               type="button"
-              @click="addTask(column.id)"
-              class="shrink-0 w-12 h-12 bg-violet-600 hover:bg-violet-500 active:bg-violet-700 rounded-2xl text-3xl flex items-center justify-center transition-all active:scale-90"
+              class="kanban-board__task-delete"
+              @click.stop="deleteTask(column.id, task.id)"
             >
-              +
+              ×
             </button>
-          </div>
 
-          <!-- Выбор приоритета (один раз на колонку) -->
-          <div class="flex gap-1.5 mb-6 min-w-0 p-1 bg-zinc-950 rounded-2xl">
-            <button
-              v-for="p in NEW_TASK_PRIORITY_OPTIONS"
-              :key="p"
-              type="button"
-              @click="newTaskPriority = p"
-              :class="[
-                'min-w-0 flex-1 flex items-center justify-center gap-1 sm:gap-2 py-2 px-1 text-[10px] sm:text-xs font-medium rounded-xl transition-all',
-                newTaskPriority === p
-                  ? 'bg-zinc-800 shadow-inner ring-1 ring-violet-400'
-                  : 'hover:bg-zinc-900',
-              ]"
-            >
-              <span :class="['w-3 h-3 shrink-0 rounded-full', getPriorityColor(p)]"></span>
-              <span class="truncate">{{ getPriorityLabel(p) }}</span>
-            </button>
-          </div>
-
-          <!-- Список задач -->
-          <div class="space-y-3 min-h-[380px]">
-            <div
-              v-for="task in column.tasks"
-              :key="task.id"
-              draggable="true"
-              @dragstart="startDrag(task, column.id)"
-              class="group bg-zinc-800 border border-zinc-700 hover:border-zinc-500 rounded-2xl p-5 cursor-grab active:cursor-grabbing transition-all relative"
-            >
-              <button
-                type="button"
-                @click.stop="deleteTask(column.id, task.id)"
-                class="absolute top-3 right-3 z-[1] text-zinc-500 hover:text-red-500 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all text-xl leading-none p-1"
+            <div v-if="editingTaskId === task.id" class="kanban-board__task-edit-wrap">
+              <input
+                v-model="editValue"
+                class="kanban-board__task-input"
+                autofocus
+                @keyup.enter="saveEdit(column.id, task.id)"
+                @blur="saveEdit(column.id, task.id)"
+                @keyup.escape="cancelEdit"
               >
-                ×
-              </button>
+            </div>
+            <div v-else class="kanban-board__task-title" @click="startEditing(task)">
+              {{ task.title }}
+            </div>
 
-              <div v-if="editingTaskId === task.id" class="min-w-0 pr-10">
-                <input
-                  v-model="editValue"
-                  @keyup.enter="saveEdit(column.id, task.id)"
-                  @blur="saveEdit(column.id, task.id)"
-                  @keyup.escape="cancelEdit"
-                  class="w-full min-w-0 bg-zinc-700 border border-violet-500 rounded-xl px-4 py-2.5 outline-none"
-                  autofocus
-                >
-              </div>
+            <div class="kanban-board__task-meta">
+              <span class="kanban-board__task-badge">TASK</span>
               <div
-                v-else
-                @click="startEditing(task)"
-                class="min-w-0 font-medium pr-10 break-words cursor-text hover:text-white transition-colors"
-              >
-                {{ task.title }}
-              </div>
-
-              <div class="mt-6 flex items-center justify-between">
-                <span class="text-[10px] uppercase tracking-widest bg-black px-3 py-1 rounded-xl text-zinc-500">TASK</span>
-                <div 
-                  @click.stop="changePriority(task.id, column.id, 
-                    task.priority === 'high' ? 'medium' : task.priority === 'medium' ? 'low' : 'high')"
-                  :class="['w-5 h-5 rounded-2xl cursor-pointer ring-2 ring-offset-2 ring-offset-zinc-800 hover:ring-violet-400 transition-all', getPriorityColor(task.priority)]"
-                ></div>
-              </div>
+                class="kanban-board__task-priority"
+                :class="getPriorityColor(task.priority)"
+                @click.stop="
+                  changePriority(
+                    task.id,
+                    column.id,
+                    task.priority === 'high'
+                      ? 'medium'
+                      : task.priority === 'medium'
+                        ? 'low'
+                        : 'high',
+                  )
+                "
+              ></div>
             </div>
           </div>
         </div>
@@ -318,3 +298,367 @@ const emit = defineEmits(['close'])
     </div>
   </div>
 </template>
+
+<style scoped>
+.kanban-board {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+  color: var(--color-text);
+}
+
+@media (min-width: 640px) {
+  .kanban-board {
+    padding-inline: 2rem;
+  }
+}
+
+.kanban-board__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.kanban-board__title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 640px) {
+  .kanban-board__title {
+    font-size: 1.875rem;
+  }
+}
+
+.kanban-board__subtitle {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.kanban-board__link-landing {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.625rem 1rem;
+  border-radius: 0.625rem;
+  border: 1px solid color-mix(in srgb, var(--color-border) 100%, transparent);
+  background: color-mix(in srgb, var(--color-surface-soft) 90%, transparent);
+  color: var(--color-text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background var(--motion-base) ease,
+    border-color var(--motion-base) ease,
+    color var(--motion-base) ease;
+}
+
+.kanban-board__link-landing:hover {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-surface-soft) 55%, transparent);
+}
+
+.kanban-board__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .kanban-board__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.kanban-board__column {
+  border-radius: 1.5rem;
+  border: 1px solid color-mix(in srgb, var(--color-border) 100%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 100%, transparent);
+  padding: 1.5rem;
+}
+
+.kanban-board__column-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.kanban-board__column-title-wrap {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.kanban-board__column-dot {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+}
+
+.kanban-board__column-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .kanban-board__column-title {
+    font-size: 1.5rem;
+  }
+}
+
+.kanban-board__column-count {
+  flex-shrink: 0;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--color-surface-soft) 100%, transparent);
+  padding: 0.25rem 0.75rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+
+.kanban-board__add-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  min-width: 0;
+}
+
+.kanban-board__input {
+  min-width: 0;
+  flex: 1;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-border) 100%, transparent);
+  background: color-mix(in srgb, var(--color-surface-soft) 92%, transparent);
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color var(--motion-base) ease;
+}
+
+.kanban-board__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.kanban-board__input:focus {
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+
+.kanban-board__add-btn {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 1rem;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--motion-base) ease,
+    transform 0.1s ease;
+}
+
+.kanban-board__add-btn:hover {
+  background: var(--color-accent-hover);
+}
+
+.kanban-board__add-btn:active {
+  transform: scale(0.94);
+}
+
+.kanban-board__priority-row {
+  display: flex;
+  gap: 0.375rem;
+  margin-bottom: 1.5rem;
+  min-width: 0;
+  padding: 0.25rem;
+  border-radius: 1rem;
+  background: var(--color-bg);
+}
+
+.kanban-board__priority-btn {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.25rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 0.625rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--motion-base) ease;
+}
+
+@media (min-width: 640px) {
+  .kanban-board__priority-btn {
+    gap: 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+.kanban-board__priority-btn:hover {
+  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+}
+
+.kanban-board__priority-btn--active {
+  background: color-mix(in srgb, var(--color-surface-soft) 100%, transparent);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  outline: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+}
+
+.kanban-board__priority-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+}
+
+.kanban-board__priority-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kanban-board__tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 380px;
+}
+
+.kanban-board__task {
+  position: relative;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-border) 100%, transparent);
+  background: color-mix(in srgb, var(--color-surface-soft) 88%, transparent);
+  padding: 1.25rem;
+  cursor: grab;
+  transition:
+    border-color var(--motion-base) ease,
+    background var(--motion-base) ease;
+}
+
+.kanban-board__task:hover {
+  border-color: color-mix(in srgb, var(--color-text-muted) 35%, var(--color-border));
+}
+
+.kanban-board__task:active {
+  cursor: grabbing;
+}
+
+.kanban-board__task-delete {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 1;
+  padding: 0.25rem;
+  border: none;
+  background: transparent;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: color var(--motion-base) ease, opacity var(--motion-base) ease;
+}
+
+.kanban-board__task:hover .kanban-board__task-delete,
+.kanban-board__task:focus-within .kanban-board__task-delete {
+  opacity: 1;
+}
+
+.kanban-board__task-delete:hover {
+  color: var(--color-danger);
+}
+
+.kanban-board__task-edit-wrap {
+  min-width: 0;
+  padding-right: 2.25rem;
+}
+
+.kanban-board__task-input {
+  width: 100%;
+  min-width: 0;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 60%, var(--color-border));
+  background: color-mix(in srgb, var(--color-surface) 95%, transparent);
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  outline: none;
+}
+
+.kanban-board__task-title {
+  min-width: 0;
+  padding-right: 2.25rem;
+  font-weight: 500;
+  word-break: break-word;
+  cursor: text;
+  transition: color var(--motion-base) ease;
+}
+
+.kanban-board__task-title:hover {
+  color: var(--color-text);
+}
+
+.kanban-board__task-meta {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kanban-board__task-badge {
+  font-size: 0.625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border-radius: 0.75rem;
+  background: #000;
+  padding: 0.25rem 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.kanban-board__task-priority {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--color-surface-soft) 100%, transparent);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color var(--motion-base) ease;
+}
+
+.kanban-board__task-priority:hover {
+  outline-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+}
+</style>
