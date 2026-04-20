@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watchEffect } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watchEffect, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   deferredInstallPrompt,
   clearDeferredInstallPrompt,
 } from '@/shared/lib/pwaInstallPrompt'
+
+const currentYear = new Date().getFullYear()
 
 const router = useRouter()
 const installButtonRef = ref<HTMLButtonElement | null>(null)
@@ -30,6 +32,41 @@ const onPwaInstalled = () => {
   installAvailable.value = false
 }
 
+const featuresSectionRef = ref<HTMLElement | null>(null)
+const footerRef = ref<HTMLElement | null>(null)
+const featuresInView = ref(false)
+const footerInView = ref(false)
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+let featuresObserver: IntersectionObserver | null = null
+let footerObserver: IntersectionObserver | null = null
+
+const observeReveal = (
+  el: HTMLElement | undefined,
+  flag: { value: boolean },
+): IntersectionObserver | undefined => {
+  if (!el) return undefined
+  if (prefersReducedMotion()) {
+    flag.value = true
+    return undefined
+  }
+
+  const io = new IntersectionObserver(
+    ([entry]) => {
+      if (entry?.isIntersecting) {
+        flag.value = true
+        io.disconnect()
+      }
+    },
+    { rootMargin: '0px 0px -6% 0px', threshold: 0.08 },
+  )
+  io.observe(el)
+  return io
+}
+
 onMounted(() => {
   updateInstallStatus()
   if (deferredInstallPrompt && !isInstalled.value) {
@@ -39,12 +76,19 @@ onMounted(() => {
   window.addEventListener('pwa-install-ready', onPwaInstallReady)
   window.addEventListener('pwa-installed', onPwaInstalled)
   window.addEventListener('resize', updateInstallStatus)
+
+  void nextTick(() => {
+    featuresObserver = observeReveal(featuresSectionRef.value ?? undefined, featuresInView) ?? null
+    footerObserver = observeReveal(footerRef.value ?? undefined, footerInView) ?? null
+  })
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('pwa-install-ready', onPwaInstallReady)
   window.removeEventListener('pwa-installed', onPwaInstalled)
   window.removeEventListener('resize', updateInstallStatus)
+  featuresObserver?.disconnect()
+  footerObserver?.disconnect()
 })
 
 watchEffect((onCleanup) => {
@@ -117,76 +161,77 @@ const goToKanban = () => router.push('/kanban')
       </div>
     </header>
 
-    <section class="landing__features" aria-labelledby="landing-features-heading">
+    <section
+      ref="featuresSectionRef"
+      class="landing__features"
+      :class="{ 'landing__features--in-view': featuresInView }"
+      aria-labelledby="landing-features-heading"
+    >
       <div class="landing__features-inner">
         <h2 id="landing-features-heading" class="landing__features-title">
           Всё рядом — и никуда не «улетает»
         </h2>
         <p class="landing__features-sub">
-          Flow спроектирован так, чтобы структура задач оставалась под вашим контролем.
+          Flow держит структуру задач ясной и под вашим контролем — как на доске.
         </p>
 
         <ul class="landing__grid">
           <li class="landing__card">
             <div class="landing__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <rect x="5" y="11" width="14" height="10" rx="2" />
-                <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke-linecap="round" />
-              </svg>
+              <span class="landing__card-emoji">🔐</span>
             </div>
-            <h3 class="landing__card-title">Локально в браузере</h3>
+            <h3 class="landing__card-title">Только локально</h3>
             <p class="landing__card-text">
-              Задачи и настройки хранятся на вашем устройстве. Без серверов и аккаунтов — только вы и
-              браузер.
+              Задачи и настройки остаются на устройстве. Без серверов и аккаунтов — только браузер и
+              вы.
             </p>
           </li>
 
           <li class="landing__card">
             <div class="landing__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M4 6h16v4H4V6zM4 14h10v4H4v-4z" stroke-linejoin="round" />
-                <path d="M16 14v4h4v-4h-4z" stroke-linejoin="round" />
-              </svg>
+              <span class="landing__card-emoji">📋</span>
             </div>
             <h3 class="landing__card-title">Канбан и приоритеты</h3>
             <p class="landing__card-text">
-              Колонки, перетаскивание и метки срочности — привычная логика без перегруженного
-              интерфейса.
+              Колонки, перетаскивание и срочность — привычная логика без перегруженного интерфейса.
             </p>
           </li>
 
           <li class="landing__card">
             <div class="landing__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M8 6h13M8 12h13M8 18h13" stroke-linecap="round" />
-                <circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none" />
-                <circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none" />
-                <circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none" />
-              </svg>
+              <span class="landing__card-emoji">✓</span>
             </div>
             <h3 class="landing__card-title">Подзадачи</h3>
             <p class="landing__card-text">
-              Разбивайте крупное на шаги: вложенность сохраняется там же — в локальном хранилище
-              браузера.
+              Крупное разбивается на шаги; чеклисты лежат рядом с карточкой — всё в том же хранилище.
             </p>
           </li>
 
           <li class="landing__card">
             <div class="landing__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
+              <span class="landing__card-emoji landing__card-emoji--moon">🌙</span>
             </div>
             <h3 class="landing__card-title">Спокойный ритм</h3>
             <p class="landing__card-text">
-              Тёмная тема, ровная сетка и мягкие акценты — меньше отвлечений, больше ясности в
-              работе.
+              Тёмная тема, ровная сетка и мягкие акценты — меньше шума, проще держать фокус.
             </p>
           </li>
         </ul>
       </div>
     </section>
+
+    <footer
+      ref="footerRef"
+      class="landing__footer"
+      :class="{ 'landing__footer--in-view': footerInView }"
+    >
+      <div class="landing__footer-inner">
+        <p class="landing__footer-privacy">
+          Все данные хранятся только в вашем браузере. Ничего никуда не улетает.
+        </p>
+        <p class="landing__footer-copy">© {{ currentYear }} Flow</p>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -329,8 +374,8 @@ const goToKanban = () => router.push('/kanban')
   transition:
     background var(--motion-base) ease,
     border-color var(--motion-base) ease,
-    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .landing__cta-primary:hover {
@@ -339,17 +384,18 @@ const goToKanban = () => router.push('/kanban')
     color-mix(in srgb, var(--color-accent-hover) 100%, #fff 8%) 0%,
     var(--color-accent-hover) 100%
   );
-  border-color: color-mix(in srgb, var(--color-accent) 40%, #fff 35%);
+  border-color: color-mix(in srgb, var(--color-accent-hover) 42%, #fff 38%);
   box-shadow:
-    0 1px 0 color-mix(in srgb, #fff 18%, transparent) inset,
-    0 20px 56px color-mix(in srgb, var(--color-accent) 58%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent),
-    0 0 48px color-mix(in srgb, var(--color-accent) 32%, transparent);
-  transform: translateY(-2px);
+    0 1px 0 color-mix(in srgb, #fff 20%, transparent) inset,
+    0 22px 64px color-mix(in srgb, var(--color-accent) 62%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 38%, transparent),
+    0 0 64px color-mix(in srgb, var(--color-accent) 44%, transparent),
+    0 0 120px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  transform: translateY(-2px) scale(1.028);
 }
 
 .landing__cta-primary:active {
-  transform: translateY(0) scale(0.988);
+  transform: translateY(0) scale(1.01);
   box-shadow:
     0 1px 0 color-mix(in srgb, #fff 10%, transparent) inset,
     0 10px 32px color-mix(in srgb, var(--color-accent) 40%, transparent);
@@ -419,8 +465,7 @@ const goToKanban = () => router.push('/kanban')
   text-align: center;
   color: var(--color-text);
   opacity: 0;
-  animation: landing-fade-up 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  animation-delay: 0.34s;
+  transform: translateY(12px);
 }
 
 .landing__features-sub {
@@ -431,8 +476,17 @@ const goToKanban = () => router.push('/kanban')
   text-align: center;
   color: var(--color-text-muted);
   opacity: 0;
-  animation: landing-fade-up 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  animation-delay: 0.4s;
+  transform: translateY(12px);
+}
+
+.landing__features--in-view .landing__features-title {
+  animation: landing-fade-up 0.58s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.04s;
+}
+
+.landing__features--in-view .landing__features-sub {
+  animation: landing-fade-up 0.58s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.1s;
 }
 
 .landing__grid {
@@ -466,29 +520,40 @@ const goToKanban = () => router.push('/kanban')
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-soft);
-  transition: border-color var(--motion-base) ease;
+  transition:
+    border-color var(--motion-base) ease,
+    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   opacity: 0;
-  animation: landing-fade-up 0.58s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transform: translateY(12px);
 }
 
-.landing__card:nth-child(1) {
-  animation-delay: 0.46s;
+.landing__features--in-view .landing__card {
+  animation: landing-fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-.landing__card:nth-child(2) {
-  animation-delay: 0.52s;
+.landing__features--in-view .landing__card:nth-child(1) {
+  animation-delay: 0.12s;
 }
 
-.landing__card:nth-child(3) {
-  animation-delay: 0.58s;
+.landing__features--in-view .landing__card:nth-child(2) {
+  animation-delay: 0.2s;
 }
 
-.landing__card:nth-child(4) {
-  animation-delay: 0.64s;
+.landing__features--in-view .landing__card:nth-child(3) {
+  animation-delay: 0.28s;
+}
+
+.landing__features--in-view .landing__card:nth-child(4) {
+  animation-delay: 0.36s;
 }
 
 .landing__card:hover {
-  border-color: color-mix(in srgb, var(--color-border) 70%, var(--color-accent));
+  border-color: color-mix(in srgb, var(--color-border) 65%, var(--color-accent));
+  box-shadow:
+    var(--shadow-soft),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 16%, transparent);
+  transform: translateY(-2px);
 }
 
 .landing__icon {
@@ -503,9 +568,18 @@ const goToKanban = () => router.push('/kanban')
   border-radius: var(--radius-sm);
 }
 
-.landing__icon svg {
-  width: 1.5rem;
-  height: 1.5rem;
+.landing__card-emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.landing__card-emoji--moon {
+  font-size: 1.35rem;
 }
 
 .landing__card-title {
@@ -524,6 +598,48 @@ const goToKanban = () => router.push('/kanban')
   color: var(--color-text-muted);
 }
 
+.landing__footer {
+  position: relative;
+  z-index: 1;
+  padding: clamp(2.25rem, 6vw, 3.25rem) clamp(1.5rem, 5vw, 2.25rem) clamp(2.75rem, 7vw, 4rem);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.landing__footer-inner {
+  max-width: 36rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.landing__footer-privacy {
+  margin: 0 0 1rem;
+  font-size: var(--font-size-xs);
+  line-height: 1.68;
+  letter-spacing: 0.02em;
+  color: var(--color-text-muted);
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.landing__footer-copy {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: color-mix(in srgb, var(--color-text-muted) 90%, var(--color-text));
+  letter-spacing: 0.03em;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.landing__footer--in-view .landing__footer-privacy,
+.landing__footer--in-view .landing__footer-copy {
+  animation: landing-fade-up 0.52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.landing__footer--in-view .landing__footer-copy {
+  animation-delay: 0.08s;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .landing__eyebrow,
   .landing__title,
@@ -531,9 +647,15 @@ const goToKanban = () => router.push('/kanban')
   .landing__actions,
   .landing__features-title,
   .landing__features-sub,
-  .landing__card {
+  .landing__card,
+  .landing__footer-privacy,
+  .landing__footer-copy {
     opacity: 1;
     animation: none;
+    transform: none;
+  }
+
+  .landing__card:hover {
     transform: none;
   }
 
