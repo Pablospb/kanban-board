@@ -46,8 +46,8 @@ import { ErrorBoundary, ToastViewport } from '@/shared/ui'
   position: sticky;
   top: 0;
   z-index: 40;
-  border-bottom: 1px solid color-mix(in srgb, var(--color-border, rgba(255, 255, 255, 0.12)) 100%, transparent);
-  background: color-mix(in srgb, var(--color-surface-elevated, #18181b) 75%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 100%, transparent);
+  background: color-mix(in srgb, var(--color-surface-elevated) 92%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -67,7 +67,7 @@ import { ErrorBoundary, ToastViewport } from '@/shared/ui'
   font-size: 0.9375rem;
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: var(--color-text, #fafafa);
+  color: var(--color-text);
 }
 
 .app-nav {
@@ -75,9 +75,9 @@ import { ErrorBoundary, ToastViewport } from '@/shared/ui'
   padding: 0.1875rem;
   gap: 0.125rem;
   border-radius: 0.625rem;
-  border: 1px solid color-mix(in srgb, var(--color-border, rgba(255, 255, 255, 0.12)) 100%, transparent);
-  background: color-mix(in srgb, var(--color-surface, #09090b) 65%, transparent);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  border: 1px solid color-mix(in srgb, var(--color-border) 100%, transparent);
+  background: color-mix(in srgb, var(--color-surface-soft) 80%, transparent);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
 }
 
 .app-nav__link {
@@ -91,7 +91,7 @@ import { ErrorBoundary, ToastViewport } from '@/shared/ui'
   font-size: 0.8125rem;
   font-weight: 500;
   letter-spacing: -0.01em;
-  color: var(--color-text-muted, #a1a1aa);
+  color: var(--color-text-muted);
   text-decoration: none;
   transition:
     color 0.15s ease,
@@ -100,20 +100,20 @@ import { ErrorBoundary, ToastViewport } from '@/shared/ui'
 }
 
 .app-nav__link:hover {
-  color: var(--color-text, #fafafa);
-  background: color-mix(in srgb, var(--color-surface-soft, #27272a) 55%, transparent);
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
 }
 
 .app-nav__link--active {
-  color: var(--color-text, #fafafa);
-  background: color-mix(in srgb, var(--color-accent, #a855f7) 88%, transparent);
+  color: #fff;
+  background: var(--color-accent);
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--color-accent, #a855f7) 45%, transparent),
-    0 2px 8px color-mix(in srgb, var(--color-accent, #a855f7) 22%, transparent);
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 40%, transparent),
+    0 2px 12px color-mix(in srgb, var(--color-accent) 35%, transparent);
 }
 
 .app-nav__link:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--color-accent, #a855f7) 65%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
   outline-offset: 2px;
 }
 

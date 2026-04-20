@@ -326,7 +326,8 @@ const getPriorityLabel = (p: Task['priority']) => {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
 }
 
 @media (min-width: 640px) {
@@ -336,8 +337,9 @@ const getPriorityLabel = (p: Task['priority']) => {
 }
 
 .kanban-board__subtitle {
-  margin: 0.25rem 0 0;
+  margin: 0.35rem 0 0;
   font-size: 0.875rem;
+  line-height: 1.45;
   color: var(--color-text-muted);
 }
 
@@ -410,6 +412,7 @@ const getPriorityLabel = (p: Task['priority']) => {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
+  line-height: 1.25;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -490,36 +493,39 @@ const getPriorityLabel = (p: Task['priority']) => {
 
 .kanban-board__priority-row {
   display: flex;
-  gap: 0.375rem;
+  gap: 0.5rem;
   margin-bottom: 1.5rem;
   min-width: 0;
-  padding: 0.25rem;
+  padding: 0.35rem;
   border-radius: 1rem;
-  background: var(--color-bg);
+  background: var(--color-surface-soft);
+  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
 }
 
 .kanban-board__priority-btn {
   min-width: 0;
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
-  padding: 0.5rem 0.25rem;
+  gap: 0.35rem;
+  padding: 0.5rem 0.2rem;
   border: none;
   border-radius: 0.75rem;
   background: transparent;
   color: var(--color-text);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 500;
+  line-height: 1.25;
   cursor: pointer;
   transition: background var(--motion-base) ease;
 }
 
 @media (min-width: 640px) {
   .kanban-board__priority-btn {
-    gap: 0.5rem;
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
+    padding-inline: 0.35rem;
   }
 }
 
@@ -528,9 +534,9 @@ const getPriorityLabel = (p: Task['priority']) => {
 }
 
 .kanban-board__priority-btn--active {
-  background: color-mix(in srgb, var(--color-surface-soft) 100%, transparent);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-  outline: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 100%, transparent);
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
+  outline: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
 .kanban-board__priority-dot {
@@ -541,9 +547,11 @@ const getPriorityLabel = (p: Task['priority']) => {
 }
 
 .kanban-board__priority-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  max-width: 100%;
+  text-align: center;
+  line-height: 1.2;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .kanban-board__tasks {
@@ -619,6 +627,7 @@ const getPriorityLabel = (p: Task['priority']) => {
   min-width: 0;
   padding-right: 2.25rem;
   font-weight: 500;
+  line-height: 1.45;
   word-break: break-word;
   cursor: text;
   transition: color var(--motion-base) ease;
@@ -637,11 +646,12 @@ const getPriorityLabel = (p: Task['priority']) => {
 
 .kanban-board__task-badge {
   font-size: 0.625rem;
-  letter-spacing: 0.2em;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   border-radius: 0.75rem;
-  background: #000;
-  padding: 0.25rem 0.75rem;
+  background: color-mix(in srgb, var(--color-text-muted) 14%, transparent);
+  padding: 0.3rem 0.65rem;
   color: var(--color-text-muted);
 }
 

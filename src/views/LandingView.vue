@@ -76,7 +76,7 @@ const goToKanban = () => router.push('/kanban')
 </script>
 
 <template>
-  <div class="min-h-screen bg-zinc-950 text-white overflow-hidden">
+  <div class="min-h-screen overflow-hidden bg-slate-50">
     <!-- Hero -->
     <div
       class="relative h-screen flex items-center justify-center bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-700 overflow-hidden"
@@ -90,7 +90,7 @@ const goToKanban = () => router.push('/kanban')
           ✨ Современный инструмент продуктивности
         </div>
 
-        <h1 class="text-7xl md:text-8xl font-bold tracking-tighter mb-6 leading-none">Modern Todo</h1>
+        <h1 class="text-6xl sm:text-7xl md:text-8xl font-bold tracking-tight mb-6 leading-[1.08]">Modern Todo</h1>
         <p class="text-2xl md:text-3xl text-white/90 mb-12 max-w-2xl mx-auto">
           Красивая канбан-доска нового поколения.<br />
           Просто. Быстро. Красиво.
@@ -145,41 +145,47 @@ const goToKanban = () => router.push('/kanban')
     </div>
 
     <!-- Features -->
-    <div class="py-28 bg-zinc-900">
+    <div class="py-28 bg-slate-50 text-slate-900">
       <div class="max-w-6xl mx-auto px-6">
-        <h2 class="text-5xl font-bold text-center mb-6">Почему Modern Todo</h2>
-        <p class="text-xl text-zinc-400 text-center mb-20 max-w-md mx-auto">
+        <h2 class="text-4xl sm:text-5xl font-bold text-center mb-4 leading-tight tracking-tight">
+          Почему Modern Todo
+        </h2>
+        <p class="text-lg sm:text-xl text-slate-600 text-center mb-16 max-w-md mx-auto leading-relaxed">
           Всё, что нужно для удобной работы с задачами
         </p>
 
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div
-            class="bg-zinc-800/80 border border-zinc-700 rounded-3xl p-10 hover:border-violet-400 hover:-translate-y-2 transition-all group"
+            class="bg-white border border-slate-200/90 shadow-sm rounded-3xl p-10 hover:border-violet-300 hover:shadow-md hover:-translate-y-1 transition-all group"
           >
             <div class="text-6xl mb-8 group-hover:scale-110 transition-transform">↔️</div>
-            <h3 class="text-3xl font-semibold mb-4">Drag &amp; Drop</h3>
-            <p class="text-zinc-400 text-lg">Мгновенное перетаскивание задач между колонками</p>
+            <h3 class="text-2xl font-semibold mb-3 leading-snug">Drag &amp; Drop</h3>
+            <p class="text-slate-600 text-base leading-relaxed">
+              Мгновенное перетаскивание задач между колонками
+            </p>
           </div>
           <div
-            class="bg-zinc-800/80 border border-zinc-700 rounded-3xl p-10 hover:border-violet-400 hover:-translate-y-2 transition-all group"
+            class="bg-white border border-slate-200/90 shadow-sm rounded-3xl p-10 hover:border-violet-300 hover:shadow-md hover:-translate-y-1 transition-all group"
           >
             <div class="text-6xl mb-8 group-hover:scale-110 transition-transform">📌</div>
-            <h3 class="text-3xl font-semibold mb-4">Подзадачи</h3>
-            <p class="text-zinc-400 text-lg">Вложенная структура любой глубины</p>
+            <h3 class="text-2xl font-semibold mb-3 leading-snug">Подзадачи</h3>
+            <p class="text-slate-600 text-base leading-relaxed">Вложенная структура любой глубины</p>
           </div>
           <div
-            class="bg-zinc-800/80 border border-zinc-700 rounded-3xl p-10 hover:border-violet-400 hover:-translate-y-2 transition-all group"
+            class="bg-white border border-slate-200/90 shadow-sm rounded-3xl p-10 hover:border-violet-300 hover:shadow-md hover:-translate-y-1 transition-all group"
           >
             <div class="text-6xl mb-8 group-hover:scale-110 transition-transform">🔥</div>
-            <h3 class="text-3xl font-semibold mb-4">Приоритеты</h3>
-            <p class="text-zinc-400 text-lg">Метки, цвета, срочность и сортировка</p>
+            <h3 class="text-2xl font-semibold mb-3 leading-snug">Приоритеты</h3>
+            <p class="text-slate-600 text-base leading-relaxed">Метки, цвета, срочность и сортировка</p>
           </div>
           <div
-            class="bg-zinc-800/80 border border-zinc-700 rounded-3xl p-10 hover:border-violet-400 hover:-translate-y-2 transition-all group"
+            class="bg-white border border-slate-200/90 shadow-sm rounded-3xl p-10 hover:border-violet-300 hover:shadow-md hover:-translate-y-1 transition-all group"
           >
             <div class="text-6xl mb-8 group-hover:scale-110 transition-transform">🌌</div>
-            <h3 class="text-3xl font-semibold mb-4">Премиум дизайн</h3>
-            <p class="text-zinc-400 text-lg">Тёмная тема, плавные анимации, идеальная типографика</p>
+            <h3 class="text-2xl font-semibold mb-3 leading-snug">Премиум дизайн</h3>
+            <p class="text-slate-600 text-base leading-relaxed">
+              Светлая тема, плавные анимации, аккуратная типографика
+            </p>
           </div>
         </div>
       </div>
