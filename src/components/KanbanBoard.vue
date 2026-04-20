@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue'
 import { RouterLink } from 'vue-router'
+import TaskCard from '@/components/TaskCard.vue'
 
 interface Task {
   id: string
@@ -247,54 +248,30 @@ const getPriorityLabel = (p: Task['priority']) => {
         </div>
 
         <div class="kanban-board__tasks">
-          <div
+          <TaskCard
             v-for="task in column.tasks"
             :key="task.id"
-            class="kanban-board__task"
-            draggable="true"
-            @dragstart="startDrag(task, column.id)"
-          >
-            <button
-              type="button"
-              class="kanban-board__task-delete"
-              @click.stop="deleteTask(column.id, task.id)"
-            >
-              ×
-            </button>
-
-            <div v-if="editingTaskId === task.id" class="kanban-board__task-edit-wrap">
-              <input
-                v-model="editValue"
-                class="kanban-board__task-input"
-                autofocus
-                @keyup.enter="saveEdit(column.id, task.id)"
-                @blur="saveEdit(column.id, task.id)"
-                @keyup.escape="cancelEdit"
-              >
-            </div>
-            <div v-else class="kanban-board__task-title" @click="startEditing(task)">
-              {{ task.title }}
-            </div>
-
-            <div class="kanban-board__task-meta">
-              <span class="kanban-board__task-badge">TASK</span>
-              <div
-                class="kanban-board__task-priority"
-                :class="getPriorityClass(task.priority)"
-                @click.stop="
-                  changePriority(
-                    task.id,
-                    column.id,
-                    task.priority === 'high'
-                      ? 'medium'
-                      : task.priority === 'medium'
-                        ? 'low'
-                        : 'high',
-                  )
-                "
-              ></div>
-            </div>
-          </div>
+            :task="task"
+            :is-editing="editingTaskId === task.id"
+            :edit-value="editValue"
+            @update:edit-value="editValue = $event"
+            @drag-start="startDrag(task, column.id)"
+            @delete="deleteTask(column.id, task.id)"
+            @start-edit="startEditing(task)"
+            @save-edit="saveEdit(column.id, task.id)"
+            @cancel-edit="cancelEdit"
+            @cycle-priority="
+              changePriority(
+                task.id,
+                column.id,
+                task.priority === 'high'
+                  ? 'medium'
+                  : task.priority === 'medium'
+                    ? 'low'
+                    : 'high',
+              )
+            "
+          />
         </div>
       </div>
     </div>
@@ -587,114 +564,4 @@ const getPriorityLabel = (p: Task['priority']) => {
   min-height: 380px;
 }
 
-.kanban-board__task {
-  position: relative;
-  border-radius: 1rem;
-  border: 1px solid color-mix(in srgb, var(--color-border) 100%, transparent);
-  background: color-mix(in srgb, var(--color-surface) 100%, transparent);
-  padding: 1.25rem;
-  cursor: grab;
-  transition:
-    border-color var(--motion-base) ease,
-    background var(--motion-base) ease;
-}
-
-.kanban-board__task:hover {
-  border-color: color-mix(in srgb, var(--color-text-muted) 35%, var(--color-border));
-}
-
-.kanban-board__task:active {
-  cursor: grabbing;
-}
-
-.kanban-board__task-delete {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  z-index: 1;
-  padding: 0.25rem;
-  border: none;
-  background: transparent;
-  font-size: 1.25rem;
-  line-height: 1;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  opacity: 0;
-  transition: color var(--motion-base) ease, opacity var(--motion-base) ease;
-}
-
-.kanban-board__task:hover .kanban-board__task-delete,
-.kanban-board__task:focus-within .kanban-board__task-delete {
-  opacity: 1;
-}
-
-.kanban-board__task-delete:hover {
-  color: var(--color-danger);
-}
-
-.kanban-board__task-edit-wrap {
-  min-width: 0;
-  padding-right: 2.25rem;
-}
-
-.kanban-board__task-input {
-  width: 100%;
-  min-width: 0;
-  border-radius: 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--color-accent) 60%, var(--color-border));
-  background: color-mix(in srgb, var(--color-surface) 95%, transparent);
-  padding: 0.625rem 1rem;
-  font-size: 0.875rem;
-  color: var(--color-text);
-  outline: none;
-}
-
-.kanban-board__task-title {
-  min-width: 0;
-  padding-right: 2.25rem;
-  font-weight: 500;
-  line-height: 1.45;
-  word-break: break-word;
-  cursor: text;
-  transition: color var(--motion-base) ease;
-}
-
-.kanban-board__task-title:hover {
-  color: var(--color-text);
-}
-
-.kanban-board__task-meta {
-  margin-top: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.kanban-board__task-badge {
-  font-size: 0.625rem;
-  line-height: 1.2;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  border-radius: 0.75rem;
-  background: color-mix(in srgb, var(--color-text-muted) 14%, transparent);
-  padding: 0.3rem 0.65rem;
-  color: var(--color-text-muted);
-}
-
-.kanban-board__task-priority {
-  width: 1.25rem;
-  height: 1.25rem;
-  flex-shrink: 0;
-  border-radius: 0.75rem;
-  cursor: pointer;
-  box-shadow:
-    0 0 0 2px color-mix(in srgb, var(--color-surface-soft) 100%, transparent);
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  transition: outline-color var(--motion-base) ease;
-}
-
-.kanban-board__task-priority:hover {
-  outline-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
-}
 </style>
