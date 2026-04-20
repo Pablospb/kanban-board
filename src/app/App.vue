@@ -8,7 +8,7 @@ import { ErrorBoundary, ToastViewport } from '@/shared/ui'
     <div class="app-shell">
       <header class="app-header" role="banner">
         <div class="app-header__inner">
-          <p class="app-header__brand">Задачи</p>
+          <p class="app-header__brand">Flow</p>
           <nav class="app-nav" aria-label="Основная навигация">
             <RouterLink
               class="app-nav__link"

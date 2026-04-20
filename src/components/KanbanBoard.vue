@@ -11,7 +11,7 @@ interface Task {
 interface Column {
   id: string
   title: string
-  color: string
+  dotVariant: 'todo' | 'progress' | 'done'
   tasks: Task[]
 }
 
@@ -51,9 +51,9 @@ function isStoredColumnRow(entry: unknown, columnId: string): entry is { id: str
 }
 
 const columns = reactive<Column[]>([
-  { id: 'todo', title: 'To Do', color: 'bg-blue-500', tasks: [] },
-  { id: 'progress', title: 'In Progress', color: 'bg-amber-500', tasks: [] },
-  { id: 'done', title: 'Done', color: 'bg-emerald-500', tasks: [] }
+  { id: 'todo', title: 'To Do', dotVariant: 'todo', tasks: [] },
+  { id: 'progress', title: 'In Progress', dotVariant: 'progress', tasks: [] },
+  { id: 'done', title: 'Done', dotVariant: 'done', tasks: [] }
 ])
 
 const newTaskTitle = ref('')
@@ -175,10 +175,10 @@ const drop = (e: DragEvent, targetColumnId: string) => {
   draggedFromColumn.value = null
 }
 
-const getPriorityColor = (p: Task['priority']) => {
-  if (p === 'high') return 'bg-red-500'
-  if (p === 'medium') return 'bg-yellow-500'
-  return 'bg-emerald-500'
+const getPriorityClass = (p: Task['priority']) => {
+  if (p === 'high') return 'kanban-board__priority-ind--high'
+  if (p === 'medium') return 'kanban-board__priority-ind--medium'
+  return 'kanban-board__priority-ind--low'
 }
 
 const getPriorityLabel = (p: Task['priority']) => {
@@ -210,7 +210,9 @@ const getPriorityLabel = (p: Task['priority']) => {
       >
         <div class="kanban-board__column-head">
           <div class="kanban-board__column-title-wrap">
-            <div :class="['kanban-board__column-dot', column.color]"></div>
+            <div
+              :class="['kanban-board__column-dot', `kanban-board__column-dot--${column.dotVariant}`]"
+            ></div>
             <h2 class="kanban-board__column-title">{{ column.title }}</h2>
           </div>
           <div class="kanban-board__column-count">
@@ -239,7 +241,7 @@ const getPriorityLabel = (p: Task['priority']) => {
             :class="{ 'kanban-board__priority-btn--active': newTaskPriority === p }"
             @click="newTaskPriority = p"
           >
-            <span :class="['kanban-board__priority-dot', getPriorityColor(p)]"></span>
+            <span :class="['kanban-board__priority-dot', getPriorityClass(p)]"></span>
             <span class="kanban-board__priority-label">{{ getPriorityLabel(p) }}</span>
           </button>
         </div>
@@ -278,7 +280,7 @@ const getPriorityLabel = (p: Task['priority']) => {
               <span class="kanban-board__task-badge">TASK</span>
               <div
                 class="kanban-board__task-priority"
-                :class="getPriorityColor(task.priority)"
+                :class="getPriorityClass(task.priority)"
                 @click.stop="
                   changePriority(
                     task.id,
@@ -382,7 +384,7 @@ const getPriorityLabel = (p: Task['priority']) => {
 .kanban-board__column {
   border-radius: 1.5rem;
   border: 1px solid color-mix(in srgb, var(--color-border) 100%, transparent);
-  background: color-mix(in srgb, var(--color-surface) 100%, transparent);
+  background: color-mix(in srgb, var(--color-surface-2) 100%, transparent);
   padding: 1.5rem;
 }
 
@@ -406,6 +408,18 @@ const getPriorityLabel = (p: Task['priority']) => {
   height: 1rem;
   flex-shrink: 0;
   border-radius: 9999px;
+}
+
+.kanban-board__column-dot--todo {
+  background: var(--color-accent);
+}
+
+.kanban-board__column-dot--progress {
+  background: color-mix(in srgb, var(--color-accent) 72%, var(--color-text-muted));
+}
+
+.kanban-board__column-dot--done {
+  background: color-mix(in srgb, var(--color-success) 75%, var(--color-accent) 25%);
 }
 
 .kanban-board__column-title {
@@ -535,7 +549,7 @@ const getPriorityLabel = (p: Task['priority']) => {
 
 .kanban-board__priority-btn--active {
   background: color-mix(in srgb, var(--color-surface) 100%, transparent);
-  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
   outline: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
@@ -544,6 +558,18 @@ const getPriorityLabel = (p: Task['priority']) => {
   height: 0.75rem;
   flex-shrink: 0;
   border-radius: 9999px;
+}
+
+.kanban-board__priority-ind--high {
+  background: var(--color-accent);
+}
+
+.kanban-board__priority-ind--medium {
+  background: color-mix(in srgb, var(--color-accent) 58%, var(--color-text-muted));
+}
+
+.kanban-board__priority-ind--low {
+  background: color-mix(in srgb, var(--color-accent) 32%, var(--color-surface-2));
 }
 
 .kanban-board__priority-label {
@@ -565,7 +591,7 @@ const getPriorityLabel = (p: Task['priority']) => {
   position: relative;
   border-radius: 1rem;
   border: 1px solid color-mix(in srgb, var(--color-border) 100%, transparent);
-  background: color-mix(in srgb, var(--color-surface-soft) 88%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 100%, transparent);
   padding: 1.25rem;
   cursor: grab;
   transition:

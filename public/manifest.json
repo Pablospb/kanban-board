@@ -1,7 +1,7 @@
 {
-  "name": "Мой Канбан",
-  "short_name": "Канбан",
-  "description": "Красивая канбан-доска нового поколения",
+  "name": "Flow",
+  "short_name": "Flow",
+  "description": "Минималистичная канбан-доска: приоритеты, подзадачи и локальное хранение в браузере.",
   "start_url": "/kanban",
   "display": "standalone",
   "background_color": "#f1f5f9",

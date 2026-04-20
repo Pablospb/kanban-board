@@ -87,13 +87,13 @@ const goToKanban = () => router.push('/kanban')
         <div
           class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-2xl px-6 py-2.5 rounded-3xl text-sm mb-8 border border-white/20"
         >
-          ✨ Современный инструмент продуктивности
+          Канбан в браузере · без регистрации
         </div>
 
-        <h1 class="text-6xl sm:text-7xl md:text-8xl font-bold tracking-tight mb-6 leading-[1.08]">Modern Todo</h1>
-        <p class="text-2xl md:text-3xl text-white/90 mb-12 max-w-2xl mx-auto">
-          Красивая канбан-доска нового поколения.<br />
-          Просто. Быстро. Красиво.
+        <h1 class="text-6xl sm:text-7xl md:text-8xl font-bold tracking-tight mb-6 leading-[1.08]">Flow</h1>
+        <p class="text-2xl md:text-3xl text-white/90 mb-12 max-w-2xl mx-auto leading-snug">
+          Задачи в одном ритме: доска, приоритеты и вложенные шаги.<br />
+          Спокойный интерфейс — данные остаются на вашем устройстве.
         </p>
 
         <div class="flex flex-col items-center gap-4">
@@ -150,10 +150,10 @@ const goToKanban = () => router.push('/kanban')
     <div class="py-28 bg-slate-50 text-slate-900">
       <div class="max-w-6xl mx-auto px-6">
         <h2 class="text-4xl sm:text-5xl font-bold text-center mb-4 leading-tight tracking-tight">
-          Почему Modern Todo
+          Почему Flow
         </h2>
-        <p class="text-lg sm:text-xl text-slate-600 text-center mb-16 max-w-md mx-auto leading-relaxed">
-          Всё, что нужно для удобной работы с задачами
+        <p class="text-lg sm:text-xl text-slate-600 text-center mb-16 max-w-lg mx-auto leading-relaxed">
+          Меньше трения — больше ясности: знакомая логика канбана без лишнего шума
         </p>
 
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -163,7 +163,7 @@ const goToKanban = () => router.push('/kanban')
             <div class="text-6xl mb-8 group-hover:scale-110 transition-transform">↔️</div>
             <h3 class="text-2xl font-semibold mb-3 leading-snug">Drag &amp; Drop</h3>
             <p class="text-slate-600 text-base leading-relaxed">
-              Мгновенное перетаскивание задач между колонками
+              Перетаскивайте карточки между колонками — отклик без задержек
             </p>
           </div>
           <div
@@ -171,22 +171,26 @@ const goToKanban = () => router.push('/kanban')
           >
             <div class="text-6xl mb-8 group-hover:scale-110 transition-transform">📌</div>
             <h3 class="text-2xl font-semibold mb-3 leading-snug">Подзадачи</h3>
-            <p class="text-slate-600 text-base leading-relaxed">Вложенная структура любой глубины</p>
+            <p class="text-slate-600 text-base leading-relaxed">
+              Дробите крупное на шаги — вложенность без потери контекста
+            </p>
           </div>
           <div
             class="bg-white border border-slate-200/90 shadow-sm rounded-3xl p-10 hover:border-slate-400 hover:shadow-md hover:-translate-y-1 transition-all group"
           >
             <div class="text-6xl mb-8 group-hover:scale-110 transition-transform">🔥</div>
             <h3 class="text-2xl font-semibold mb-3 leading-snug">Приоритеты</h3>
-            <p class="text-slate-600 text-base leading-relaxed">Метки, цвета, срочность и сортировка</p>
+            <p class="text-slate-600 text-base leading-relaxed">
+              Метки и цвета помогают видеть срочное и держать фокус
+            </p>
           </div>
           <div
             class="bg-white border border-slate-200/90 shadow-sm rounded-3xl p-10 hover:border-slate-400 hover:shadow-md hover:-translate-y-1 transition-all group"
           >
             <div class="text-6xl mb-8 group-hover:scale-110 transition-transform">🌌</div>
-            <h3 class="text-2xl font-semibold mb-3 leading-snug">Премиум дизайн</h3>
+            <h3 class="text-2xl font-semibold mb-3 leading-snug">Спокойный интерфейс</h3>
             <p class="text-slate-600 text-base leading-relaxed">
-              Светлая тема, плавные анимации, аккуратная типографика
+              Светлая тема, ровная сетка и анимации, которые не отвлекают
             </p>
           </div>
         </div>
