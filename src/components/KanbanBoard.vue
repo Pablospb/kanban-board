@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import TaskCard from '@/components/TaskCard.vue'
 
@@ -62,6 +62,22 @@ const newTaskPriority = ref<'low' | 'medium' | 'high'>('medium')
 
 const draggedTask = ref<Task | null>(null)
 const draggedFromColumn = ref<string | null>(null)
+/** Глубина вложенности dragenter/dragleave по колонке — для стабильной подсветки drop-зоны */
+const columnDragDepth = reactive<Record<string, number>>({})
+
+function columnDragEnter(columnId: string) {
+  columnDragDepth[columnId] = (columnDragDepth[columnId] ?? 0) + 1
+}
+
+function columnDragLeave(columnId: string) {
+  columnDragDepth[columnId] = Math.max(0, (columnDragDepth[columnId] ?? 1) - 1)
+}
+
+function resetColumnDragDepth() {
+  for (const key of Object.keys(columnDragDepth)) {
+    columnDragDepth[key] = 0
+  }
+}
 const editingTaskId = ref<string | null>(null)
 const editValue = ref('')
 
@@ -102,7 +118,13 @@ const saveToStorage = () => {
   localStorage.setItem('modernTodo', JSON.stringify(columns))
 }
 
-onMounted(loadFromStorage)
+onMounted(() => {
+  loadFromStorage()
+  window.addEventListener('dragend', resetColumnDragDepth)
+})
+onUnmounted(() => {
+  window.removeEventListener('dragend', resetColumnDragDepth)
+})
 watch(columns, saveToStorage, { deep: true })
 
 const addTask = (columnId: string) => {
@@ -174,6 +196,7 @@ const drop = (e: DragEvent, targetColumnId: string) => {
   }
   draggedTask.value = null
   draggedFromColumn.value = null
+  resetColumnDragDepth()
 }
 
 const getPriorityClass = (p: Task['priority']) => {
@@ -206,10 +229,19 @@ const getPriorityLabel = (p: Task['priority']) => {
         v-for="column in columns"
         :key="column.id"
         class="kanban-board__column"
+        :class="{
+          'kanban-board__column--drag-over': (columnDragDepth[column.id] ?? 0) > 0,
+          'kanban-board__column--in-progress': column.id === 'progress',
+        }"
         @dragover="allowDrop"
+        @dragenter.prevent="columnDragEnter(column.id)"
+        @dragleave="columnDragLeave(column.id)"
         @drop="drop($event, column.id)"
       >
-        <div class="kanban-board__column-head">
+        <div
+          class="kanban-board__column-head"
+          :class="`kanban-board__column-head--${column.dotVariant}`"
+        >
           <div class="kanban-board__column-title-wrap">
             <div
               :class="['kanban-board__column-dot', `kanban-board__column-dot--${column.dotVariant}`]"
@@ -349,7 +381,7 @@ const getPriorityLabel = (p: Task['priority']) => {
 .kanban-board__grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 @media (min-width: 768px) {
@@ -359,10 +391,48 @@ const getPriorityLabel = (p: Task['priority']) => {
 }
 
 .kanban-board__column {
-  border-radius: 1.5rem;
-  border: 1px solid color-mix(in srgb, var(--color-border) 100%, transparent);
-  background: color-mix(in srgb, var(--color-surface-2) 100%, transparent);
-  padding: 1.5rem;
+  position: relative;
+  border-radius: calc(var(--radius-md) + 6px);
+  border: 1px solid color-mix(in srgb, var(--color-border) 92%, transparent);
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--color-surface) 40%, var(--color-surface-2)),
+    color-mix(in srgb, var(--color-surface-2) 100%, transparent)
+  );
+  box-shadow:
+    var(--shadow-soft),
+    0 1px 0 color-mix(in srgb, var(--color-text) 6%, transparent);
+  padding: 1.25rem 1.35rem 1.5rem;
+  transition:
+    border-color var(--motion-base) ease,
+    box-shadow var(--motion-base) ease,
+    background var(--motion-base) ease;
+}
+
+.kanban-board__column--in-progress {
+  border-color: color-mix(in srgb, var(--color-accent) 38%, var(--color-border));
+  box-shadow:
+    var(--shadow-soft),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 14%, transparent),
+    0 12px 40px color-mix(in srgb, var(--color-accent) 12%, transparent);
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--color-accent) 7%, var(--color-surface)),
+    color-mix(in srgb, var(--color-accent) 4%, var(--color-surface-2))
+  );
+}
+
+.kanban-board__column--drag-over {
+  border-color: color-mix(in srgb, var(--color-accent) 48%, var(--color-border));
+  box-shadow:
+    var(--shadow-soft),
+    0 0 0 2px color-mix(in srgb, var(--color-accent) 22%, transparent),
+    0 0 28px color-mix(in srgb, var(--color-accent) 14%, transparent);
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--color-accent) 9%, var(--color-surface)),
+    color-mix(in srgb, var(--color-accent) 5%, var(--color-surface-2))
+  );
 }
 
 .kanban-board__column-head {
@@ -370,7 +440,39 @@ const getPriorityLabel = (p: Task['priority']) => {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  margin: -0.35rem -0.35rem 1.25rem;
+  padding: 0.65rem 0.85rem 0.7rem;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--color-border) 75%, transparent);
+  background: color-mix(in srgb, var(--color-surface-soft) 55%, var(--color-surface));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-text) 5%, transparent);
+}
+
+.kanban-board__column-head--todo {
+  border-left: 3px solid var(--color-accent);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-soft)),
+    color-mix(in srgb, var(--color-surface-soft) 40%, var(--color-surface))
+  );
+}
+
+.kanban-board__column-head--progress {
+  border-left: 3px solid color-mix(in srgb, var(--color-accent) 72%, var(--color-text-muted));
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-soft)),
+    color-mix(in srgb, var(--color-surface-soft) 35%, var(--color-surface))
+  );
+}
+
+.kanban-board__column-head--done {
+  border-left: 3px solid color-mix(in srgb, var(--color-success) 70%, var(--color-accent));
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-success) 10%, var(--color-surface-soft)),
+    color-mix(in srgb, var(--color-surface-soft) 40%, var(--color-surface))
+  );
 }
 
 .kanban-board__column-title-wrap {
@@ -401,29 +503,40 @@ const getPriorityLabel = (p: Task['priority']) => {
 
 .kanban-board__column-title {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 600;
   line-height: 1.25;
+  letter-spacing: -0.02em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  background: linear-gradient(
+    105deg,
+    color-mix(in srgb, var(--color-accent) 92%, var(--color-text)),
+    color-mix(in srgb, var(--color-accent) 55%, var(--color-text-muted))
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 @media (min-width: 640px) {
   .kanban-board__column-title {
-    font-size: 1.5rem;
+    font-size: 1.3125rem;
   }
 }
 
 .kanban-board__column-count {
   flex-shrink: 0;
-  border-radius: 1rem;
-  background: color-mix(in srgb, var(--color-surface-soft) 100%, transparent);
-  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface) 80%, var(--color-accent) 8%);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 22%, var(--color-border));
+  padding: 0.2rem 0.65rem;
   font-family: ui-monospace, monospace;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
-  color: var(--color-text-muted);
+  color: color-mix(in srgb, var(--color-accent) 45%, var(--color-text-muted));
 }
 
 .kanban-board__add-row {
@@ -562,6 +675,22 @@ const getPriorityLabel = (p: Task['priority']) => {
   flex-direction: column;
   gap: 0.75rem;
   min-height: 380px;
+  margin-top: 0.25rem;
+  padding: 0.5rem;
+  margin-inline: -0.35rem;
+  border-radius: var(--radius-md);
+  border: 1px dashed color-mix(in srgb, var(--color-border) 85%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 35%, transparent);
+  transition:
+    border-color var(--motion-base) ease,
+    background var(--motion-base) ease,
+    box-shadow var(--motion-base) ease;
+}
+
+.kanban-board__column--drag-over .kanban-board__tasks {
+  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 12%, transparent);
 }
 
 </style>
