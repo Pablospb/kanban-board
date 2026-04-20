@@ -191,8 +191,20 @@ const goToKanban = () => router.push('/kanban')
 </template>
 
 <style scoped>
+@keyframes landing-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .landing {
   position: relative;
+  isolation: isolate;
   min-height: 100vh;
   overflow-x: hidden;
   background: var(--color-bg);
@@ -202,14 +214,22 @@ const goToKanban = () => router.push('/kanban')
 .landing__glow {
   pointer-events: none;
   position: absolute;
-  inset: -20% -10% auto;
-  height: min(70vh, 520px);
-  background: radial-gradient(
-    ellipse 80% 60% at 50% 0%,
-    color-mix(in srgb, var(--color-accent) 22%, transparent) 0%,
-    transparent 65%
-  );
-  opacity: 0.85;
+  z-index: 0;
+  inset: -28% -15% auto;
+  height: min(78vh, 580px);
+  background:
+    radial-gradient(
+      ellipse 72% 55% at 50% -5%,
+      color-mix(in srgb, var(--color-accent) 38%, transparent) 0%,
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 110% 70% at 50% 12%,
+      color-mix(in srgb, var(--color-accent) 18%, transparent) 0%,
+      transparent 72%
+    );
+  opacity: 1;
+  filter: blur(2px);
 }
 
 .landing__hero {
@@ -217,55 +237,70 @@ const goToKanban = () => router.push('/kanban')
   z-index: 1;
   max-width: 52rem;
   margin: 0 auto;
-  padding: clamp(3.5rem, 12vw, 7rem) clamp(1.5rem, 5vw, 2rem) clamp(4rem, 10vw, 6rem);
+  padding: clamp(4rem, 11vw, 7.5rem) clamp(1.5rem, 5vw, 2.25rem) clamp(4.5rem, 11vw, 6.5rem);
   text-align: center;
 }
 
 .landing__eyebrow {
   display: inline-block;
-  margin: 0 0 2rem;
-  padding: 0.5rem 1rem;
+  margin: 0 0 2.25rem;
+  padding: 0.5rem 1.125rem;
   font-size: var(--font-size-xs);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--color-text-muted);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 999px;
+  opacity: 0;
+  animation: landing-fade-up 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.06s;
 }
 
 .landing__title {
-  margin: 0 0 1.75rem;
-  font-size: clamp(4.25rem, 14vw, 7.5rem);
+  margin: 0 0 2rem;
+  font-size: clamp(4.5rem, 14vw, 7.75rem);
   font-weight: 600;
-  line-height: 0.95;
-  letter-spacing: -0.04em;
+  line-height: 0.94;
+  letter-spacing: -0.042em;
   background: linear-gradient(
     180deg,
     var(--color-text) 0%,
-    color-mix(in srgb, var(--color-text) 72%, var(--color-text-muted)) 100%
+    color-mix(in srgb, var(--color-text) 68%, var(--color-text-muted)) 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  filter: drop-shadow(0 0 28px color-mix(in srgb, var(--color-accent) 42%, transparent))
+    drop-shadow(0 0 72px color-mix(in srgb, var(--color-accent) 28%, transparent))
+    drop-shadow(0 0 120px color-mix(in srgb, var(--color-accent) 14%, transparent));
+  opacity: 0;
+  animation: landing-fade-up 0.68s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.13s;
 }
 
 .landing__lead {
-  margin: 0 auto 2.75rem;
-  max-width: 34rem;
-  font-size: clamp(1.125rem, 2.8vw, 1.375rem);
-  line-height: 1.65;
+  margin: 0 auto 3rem;
+  max-width: 36rem;
+  font-size: clamp(1.125rem, 2.6vw, 1.3125rem);
+  line-height: 1.72;
   color: var(--color-text-muted);
   font-weight: 400;
+  opacity: 0;
+  animation: landing-fade-up 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.2s;
 }
 
 .landing__actions {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 1.125rem;
   max-width: 28rem;
   margin: 0 auto;
+  opacity: 0;
+  animation: landing-fade-up 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.27s;
 }
 
 .landing__cta-primary {
@@ -273,32 +308,51 @@ const goToKanban = () => router.push('/kanban')
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 3.75rem;
-  padding: 1rem 2rem;
-  font-size: 1.0625rem;
+  min-height: 4.125rem;
+  padding: 1.125rem 2rem;
+  font-size: 1.125rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.015em;
   color: #fff;
-  background: var(--color-accent);
-  border: none;
-  border-radius: 14px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-accent) 100%, #fff 6%) 0%,
+    var(--color-accent) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--color-accent) 55%, #fff 18%);
+  border-radius: var(--radius-md);
   cursor: pointer;
   box-shadow:
-    0 1px 0 color-mix(in srgb, #fff 12%, transparent) inset,
-    0 12px 40px color-mix(in srgb, var(--color-accent) 42%, transparent);
-  transition: background var(--motion-base) ease, transform var(--motion-base) ease,
-    box-shadow var(--motion-base) ease;
+    0 1px 0 color-mix(in srgb, #fff 14%, transparent) inset,
+    0 14px 44px color-mix(in srgb, var(--color-accent) 48%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 22%, transparent);
+  transition:
+    background var(--motion-base) ease,
+    border-color var(--motion-base) ease,
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .landing__cta-primary:hover {
-  background: var(--color-accent-hover);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-accent-hover) 100%, #fff 8%) 0%,
+    var(--color-accent-hover) 100%
+  );
+  border-color: color-mix(in srgb, var(--color-accent) 40%, #fff 35%);
   box-shadow:
-    0 1px 0 color-mix(in srgb, #fff 14%, transparent) inset,
-    0 16px 48px color-mix(in srgb, var(--color-accent) 48%, transparent);
+    0 1px 0 color-mix(in srgb, #fff 18%, transparent) inset,
+    0 20px 56px color-mix(in srgb, var(--color-accent) 58%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent),
+    0 0 48px color-mix(in srgb, var(--color-accent) 32%, transparent);
+  transform: translateY(-2px);
 }
 
 .landing__cta-primary:active {
-  transform: scale(0.992);
+  transform: translateY(0) scale(0.988);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 10%, transparent) inset,
+    0 10px 32px color-mix(in srgb, var(--color-accent) 40%, transparent);
 }
 
 .landing__cta-secondary {
@@ -313,7 +367,7 @@ const goToKanban = () => router.push('/kanban')
   color: var(--color-text);
   background: transparent;
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition:
     border-color var(--motion-base) ease,
@@ -329,7 +383,7 @@ const goToKanban = () => router.push('/kanban')
   margin: 0;
   max-width: 26rem;
   font-size: var(--font-size-xs);
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--color-text-muted);
 }
 
@@ -342,9 +396,13 @@ const goToKanban = () => router.push('/kanban')
 .landing__features {
   position: relative;
   z-index: 1;
-  padding: clamp(3rem, 8vw, 5rem) clamp(1.5rem, 5vw, 2rem) clamp(5rem, 12vw, 7rem);
+  padding: clamp(3.5rem, 9vw, 5.5rem) clamp(1.5rem, 5vw, 2.25rem) clamp(5.5rem, 12vw, 7.5rem);
   border-top: 1px solid var(--color-border);
-  background: linear-gradient(180deg, var(--color-bg) 0%, color-mix(in srgb, var(--color-surface) 35%, var(--color-bg)) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--color-bg) 0%,
+    color-mix(in srgb, var(--color-surface) 35%, var(--color-bg)) 100%
+  );
 }
 
 .landing__features-inner {
@@ -353,26 +411,33 @@ const goToKanban = () => router.push('/kanban')
 }
 
 .landing__features-title {
-  margin: 0 0 1rem;
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  margin: 0 0 1.125rem;
+  font-size: clamp(1.8125rem, 4vw, 2.375rem);
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.022em;
+  line-height: 1.2;
   text-align: center;
   color: var(--color-text);
+  opacity: 0;
+  animation: landing-fade-up 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.34s;
 }
 
 .landing__features-sub {
-  margin: 0 auto 3rem;
-  max-width: 36rem;
+  margin: 0 auto 3.25rem;
+  max-width: 38rem;
   font-size: var(--font-size-sm);
-  line-height: 1.6;
+  line-height: 1.68;
   text-align: center;
   color: var(--color-text-muted);
+  opacity: 0;
+  animation: landing-fade-up 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: 0.4s;
 }
 
 .landing__grid {
   display: grid;
-  gap: 1.25rem;
+  gap: 1.375rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -381,14 +446,14 @@ const goToKanban = () => router.push('/kanban')
 @media (min-width: 640px) {
   .landing__grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    gap: 1.625rem;
   }
 }
 
 @media (min-width: 1024px) {
   .landing__grid {
     grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
+    gap: 1.625rem;
   }
 }
 
@@ -396,12 +461,30 @@ const goToKanban = () => router.push('/kanban')
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 1.75rem 1.5rem;
+  padding: 1.875rem 1.625rem;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-soft);
   transition: border-color var(--motion-base) ease;
+  opacity: 0;
+  animation: landing-fade-up 0.58s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.landing__card:nth-child(1) {
+  animation-delay: 0.46s;
+}
+
+.landing__card:nth-child(2) {
+  animation-delay: 0.52s;
+}
+
+.landing__card:nth-child(3) {
+  animation-delay: 0.58s;
+}
+
+.landing__card:nth-child(4) {
+  animation-delay: 0.64s;
 }
 
 .landing__card:hover {
@@ -414,7 +497,7 @@ const goToKanban = () => router.push('/kanban')
   justify-content: center;
   width: 3rem;
   height: 3rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.375rem;
   color: var(--color-accent);
   background: color-mix(in srgb, var(--color-accent) 14%, transparent);
   border-radius: var(--radius-sm);
@@ -426,18 +509,38 @@ const goToKanban = () => router.push('/kanban')
 }
 
 .landing__card-title {
-  margin: 0 0 0.625rem;
+  margin: 0 0 0.6875rem;
   font-size: var(--font-size-xl);
   font-weight: 600;
   letter-spacing: -0.02em;
-  line-height: 1.25;
+  line-height: 1.28;
   color: var(--color-text);
 }
 
 .landing__card-text {
   margin: 0;
   font-size: var(--font-size-sm);
-  line-height: 1.6;
+  line-height: 1.65;
   color: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing__eyebrow,
+  .landing__title,
+  .landing__lead,
+  .landing__actions,
+  .landing__features-title,
+  .landing__features-sub,
+  .landing__card {
+    opacity: 1;
+    animation: none;
+    transform: none;
+  }
+
+  .landing__cta-primary,
+  .landing__cta-primary:hover,
+  .landing__cta-primary:active {
+    transform: none;
+  }
 }
 </style>
