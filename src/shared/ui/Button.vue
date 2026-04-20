@@ -34,7 +34,7 @@ withDefaults(
 }
 
 .ui-button:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--color-accent, #a855f7) 35%, var(--color-border, rgba(255, 255, 255, 0.14)));
+  border-color: color-mix(in srgb, var(--color-accent, #3d4248) 35%, var(--color-border, rgba(255, 255, 255, 0.14)));
 }
 
 .ui-button:disabled {

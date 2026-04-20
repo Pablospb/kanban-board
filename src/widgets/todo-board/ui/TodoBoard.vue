@@ -148,7 +148,7 @@ const filteredTodos = computed((): Todo[] => {
 .todo-board__checkbox {
   width: 1.1rem;
   height: 1.1rem;
-  accent-color: var(--color-accent, #a855f7);
+  accent-color: var(--color-accent, #3d4248);
 }
 
 .todo-board__label {

@@ -136,7 +136,9 @@ const goToKanban = () => router.push('/kanban')
         </div>
       </div>
 
-      <div class="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center text-white/60">
+      <div
+        class="absolute bottom-[calc(3rem-1cm)] left-1/2 flex -translate-x-1/2 flex-col items-center text-white/60"
+      >
         <span class="text-sm mb-3 tracking-widest">ПРОКРУТИТЬ ВНИЗ</span>
         <div class="w-6 h-10 border-2 border-white/60 rounded-full flex items-center justify-center">
           <div class="w-1.5 h-3 bg-white rounded-full animate-bounce"></div>
@@ -156,7 +158,7 @@ const goToKanban = () => router.push('/kanban')
 
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div
-            class="bg-white border border-slate-200/90 shadow-sm rounded-3xl p-10 hover:border-violet-300 hover:shadow-md hover:-translate-y-1 transition-all group"
+            class="bg-white border border-slate-200/90 shadow-sm rounded-3xl p-10 hover:border-slate-400 hover:shadow-md hover:-translate-y-1 transition-all group"
           >
             <div class="text-6xl mb-8 group-hover:scale-110 transition-transform">↔️</div>
             <h3 class="text-2xl font-semibold mb-3 leading-snug">Drag &amp; Drop</h3>
@@ -165,21 +167,21 @@ const goToKanban = () => router.push('/kanban')
             </p>
           </div>
           <div
-            class="bg-white border border-slate-200/90 shadow-sm rounded-3xl p-10 hover:border-violet-300 hover:shadow-md hover:-translate-y-1 transition-all group"
+            class="bg-white border border-slate-200/90 shadow-sm rounded-3xl p-10 hover:border-slate-400 hover:shadow-md hover:-translate-y-1 transition-all group"
           >
             <div class="text-6xl mb-8 group-hover:scale-110 transition-transform">📌</div>
             <h3 class="text-2xl font-semibold mb-3 leading-snug">Подзадачи</h3>
             <p class="text-slate-600 text-base leading-relaxed">Вложенная структура любой глубины</p>
           </div>
           <div
-            class="bg-white border border-slate-200/90 shadow-sm rounded-3xl p-10 hover:border-violet-300 hover:shadow-md hover:-translate-y-1 transition-all group"
+            class="bg-white border border-slate-200/90 shadow-sm rounded-3xl p-10 hover:border-slate-400 hover:shadow-md hover:-translate-y-1 transition-all group"
           >
             <div class="text-6xl mb-8 group-hover:scale-110 transition-transform">🔥</div>
             <h3 class="text-2xl font-semibold mb-3 leading-snug">Приоритеты</h3>
             <p class="text-slate-600 text-base leading-relaxed">Метки, цвета, срочность и сортировка</p>
           </div>
           <div
-            class="bg-white border border-slate-200/90 shadow-sm rounded-3xl p-10 hover:border-violet-300 hover:shadow-md hover:-translate-y-1 transition-all group"
+            class="bg-white border border-slate-200/90 shadow-sm rounded-3xl p-10 hover:border-slate-400 hover:shadow-md hover:-translate-y-1 transition-all group"
           >
             <div class="text-6xl mb-8 group-hover:scale-110 transition-transform">🌌</div>
             <h3 class="text-2xl font-semibold mb-3 leading-snug">Премиум дизайн</h3>

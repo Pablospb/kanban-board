@@ -5,7 +5,7 @@
   "start_url": "/kanban",
   "display": "standalone",
   "background_color": "#f1f5f9",
-  "theme_color": "#7c3aed",
+  "theme_color": "#3d4248",
   "icons": [
     {
       "src": "/icons/icon-192.png",

@@ -42,7 +42,7 @@ defineProps<{
 }
 
 .ui-input:focus-visible {
-  border-color: color-mix(in srgb, var(--color-accent, #a855f7) 50%, var(--color-border, rgba(255, 255, 255, 0.14)));
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent, #a855f7) 25%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent, #3d4248) 50%, var(--color-border, rgba(255, 255, 255, 0.14)));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent, #3d4248) 25%, transparent);
 }
 </style>
