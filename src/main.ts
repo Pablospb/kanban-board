@@ -1,4 +1,6 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query'
 
 import { App } from '@/app'
 
@@ -6,15 +8,14 @@ import { router } from './router'
 
 import { initPwaInstallPrompt } from '@/shared/lib/pwaInstallPrompt'
 
-
-
 import './style.css'
 
-
+const pinia = createPinia()
+const queryClient = new QueryClient()
 
 initPwaInstallPrompt()
 
-createApp(App).use(router).mount('#app')
+createApp(App).use(pinia).use(router).use(VueQueryPlugin, { queryClient }).mount('#app')
 
 
 
