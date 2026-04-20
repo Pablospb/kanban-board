@@ -14,6 +14,41 @@ interface Column {
   tasks: Task[]
 }
 
+const NEW_TASK_PRIORITY_OPTIONS = ['high', 'medium', 'low'] as const
+
+function isTaskPriority(value: unknown): value is Task['priority'] {
+  return value === 'low' || value === 'medium' || value === 'high'
+}
+
+function parseStoredTasks(raw: unknown): Task[] {
+  if (!Array.isArray(raw)) {
+    return []
+  }
+  const tasks: Task[] = []
+  for (const item of raw) {
+    if (item === null || typeof item !== 'object') {
+      continue
+    }
+    const rec = item as Record<string, unknown>
+    const id = rec.id
+    const title = rec.title
+    const priority = rec.priority
+    if (typeof id !== 'string' || typeof title !== 'string' || !isTaskPriority(priority)) {
+      continue
+    }
+    tasks.push({ id, title, priority })
+  }
+  return tasks
+}
+
+function isStoredColumnRow(entry: unknown, columnId: string): entry is { id: string; tasks?: unknown } {
+  if (entry === null || typeof entry !== 'object' || !('id' in entry)) {
+    return false
+  }
+  const id = (entry as { id: unknown }).id
+  return typeof id === 'string' && id === columnId
+}
+
 const columns = reactive<Column[]>([
   { id: 'todo', title: 'To Do', color: 'bg-blue-500', tasks: [] },
   { id: 'progress', title: 'In Progress', color: 'bg-amber-500', tasks: [] },
@@ -31,11 +66,20 @@ const editValue = ref('')
 const loadFromStorage = () => {
   const saved = localStorage.getItem('modernTodo')
   if (saved) {
-    const parsed = JSON.parse(saved)
-    columns.forEach(col => {
-      const savedCol = parsed.find((c: any) => c.id === col.id)
-      if (savedCol?.tasks) col.tasks = savedCol.tasks
-    })
+    try {
+      const parsed: unknown = JSON.parse(saved)
+      if (!Array.isArray(parsed)) {
+        return
+      }
+      columns.forEach((col) => {
+        const savedCol = parsed.find((entry) => isStoredColumnRow(entry, col.id))
+        if (savedCol?.tasks !== undefined) {
+          col.tasks = parseStoredTasks(savedCol.tasks)
+        }
+      })
+    } catch {
+      /* некорректный JSON — оставляем текущее состояние колонок */
+    }
   } else {
     columns[0].tasks = [
       { id: '1', title: 'Изучить новый дизайн системы', priority: 'high' },
@@ -130,13 +174,13 @@ const drop = (e: DragEvent, targetColumnId: string) => {
   draggedFromColumn.value = null
 }
 
-const getPriorityColor = (p: string) => {
+const getPriorityColor = (p: Task['priority']) => {
   if (p === 'high') return 'bg-red-500'
   if (p === 'medium') return 'bg-yellow-500'
   return 'bg-emerald-500'
 }
 
-const getPriorityLabel = (p: string) => {
+const getPriorityLabel = (p: Task['priority']) => {
   if (p === 'high') return 'Высокий'
   if (p === 'medium') return 'Средний'
   return 'Низкий'
@@ -208,10 +252,10 @@ const emit = defineEmits(['close'])
           <!-- Выбор приоритета (один раз на колонку) -->
           <div class="flex gap-1.5 mb-6 min-w-0 p-1 bg-zinc-950 rounded-2xl">
             <button
-              v-for="p in ['high', 'medium', 'low']"
+              v-for="p in NEW_TASK_PRIORITY_OPTIONS"
               :key="p"
               type="button"
-              @click="newTaskPriority = p as any"
+              @click="newTaskPriority = p"
               :class="[
                 'min-w-0 flex-1 flex items-center justify-center gap-1 sm:gap-2 py-2 px-1 text-[10px] sm:text-xs font-medium rounded-xl transition-all',
                 newTaskPriority === p
